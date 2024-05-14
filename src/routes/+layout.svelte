@@ -1,56 +1,26 @@
-<script>
-	export const prerender = true
-	export const ssr = false
-
+<script lang="ts">
+	import '../app.css'
 	import Header from './Header.svelte'
-	import './styles.css'
-</script>
+	import { invoke } from '@tauri-apps/api/tauri'
+	import { appWindow } from '@tauri-apps/api/window'
 
-<div class="app">
-	<Header />
+	invoke('init_spotlight_window')
 
-	<main>
-		<slot />
-	</main>
-
-	<footer>
-		<p>visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to learn SvelteKit</p>
-	</footer>
-</div>
-
-<style>
-	.app {
-		display: flex;
-		flex-direction: column;
-		min-height: 100vh;
-	}
-
-	main {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		padding: 1rem;
-		width: 100%;
-		max-width: 64rem;
-		margin: 0 auto;
-		box-sizing: border-box;
-	}
-
-	footer {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		padding: 12px;
-	}
-
-	footer a {
-		font-weight: bold;
-	}
-
-	@media (min-width: 480px) {
-		footer {
-			padding: 12px 0;
+	const handleEscape = (event: KeyboardEvent) => {
+		if (event.key === 'Escape') {
+			event.preventDefault()
+			invoke('hide_spotlight')
 		}
 	}
-</style>
+	window.addEventListener('keydown', handleEscape)
+</script>
+
+<main class="h-screen flex flex-col">
+	<button
+		class="h-5 w-full cursor-default"
+		on:mousedown={() => {
+			appWindow.startDragging()
+		}}
+	></button>
+	<slot />
+</main>
