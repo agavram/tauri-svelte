@@ -474,8 +474,13 @@ fn create_spotlight_panel(window: &Window<Wry>) -> ShareId<RawNSPanel> {
     let panel = panel.share();
 
     #[cfg(target_os = "macos")]
-    apply_vibrancy(&w, NSVisualEffectMaterial::ContentBackground, None, Some(10.0))
-        .expect("Unsupported platform! 'apply_vibrancy' is only supported on macOS");
+    apply_vibrancy(
+        &w,
+        NSVisualEffectMaterial::ContentBackground,
+        None,
+        Some(10.0),
+    )
+    .expect("Unsupported platform! 'apply_vibrancy' is only supported on macOS");
 
     // Set panel above the main menu window level
     panel.set_level(NSMainMenuWindowLevel + 1);
@@ -485,8 +490,7 @@ fn create_spotlight_panel(window: &Window<Wry>) -> ShareId<RawNSPanel> {
 
     // Ensure that the panel can display over the top of fullscreen apps
     panel.set_collection_behaviour(
-        NSWindowCollectionBehavior::NSWindowCollectionBehaviorTransient
-            | NSWindowCollectionBehavior::NSWindowCollectionBehaviorMoveToActiveSpace
+        NSWindowCollectionBehavior::NSWindowCollectionBehaviorMoveToActiveSpace
             | NSWindowCollectionBehavior::NSWindowCollectionBehaviorFullScreenAuxiliary
             | NSWindowCollectionBehavior::NSWindowCollectionBehaviorManaged,
     );
