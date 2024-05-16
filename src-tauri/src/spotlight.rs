@@ -185,16 +185,13 @@ pub fn hide_spotlight(app_handle: AppHandle<Wry>) {
 /// Positions a given window at the center of the monitor with cursor
 fn position_window_at_the_center_of_the_monitor_with_cursor(window: &Window<Wry>) {
     if let Some(monitor) = get_monitor_with_cursor() {
-        let display_size = monitor.size.to_logical::<f64>(monitor.scale_factor);
-        let display_pos = monitor.position.to_logical::<f64>(monitor.scale_factor);
-
         let handle: id = window.ns_window().unwrap() as _;
         let win_frame: NSRect = unsafe { NSView::frame(handle) };
-        let size = NSSize::new(700.0, 600.0);
+        let size = NSSize::new(win_frame.size.width, win_frame.size.height);
         let rect = NSRect {
             origin: NSPoint {
-                x: (display_pos.x + (display_size.width / 2.0)) - (size.width / 2.0),
-                y: (display_pos.y + (display_size.height / 1.7)) - (size.height / 2.0),
+                x: win_frame.origin.x,
+                y: win_frame.origin.y,
             },
             size: size,
         };
@@ -485,21 +482,19 @@ fn create_spotlight_panel(window: &Window<Wry>) -> ShareId<RawNSPanel> {
     // Set panel above the main menu window level
     panel.set_level(NSMainMenuWindowLevel + 1);
 
-    // Set panel to auto hide when it resigns key
     panel.set_auto_hide(true);
 
     // Ensure that the panel can display over the top of fullscreen apps
     panel.set_collection_behaviour(
         NSWindowCollectionBehavior::NSWindowCollectionBehaviorMoveToActiveSpace
-            | NSWindowCollectionBehavior::NSWindowCollectionBehaviorFullScreenAuxiliary
-            | NSWindowCollectionBehavior::NSWindowCollectionBehaviorManaged,
+            | NSWindowCollectionBehavior::NSWindowCollectionBehaviorFullScreenAuxiliary,
     );
 
     // Ensures panel does not activate
     // panel.set_style_mask(NSWindowStyleMaskNonActivatingPanel);
     panel.set_style_mask(NSWindowStyleMaskNonActivatingPanel | NSWindowStyleMaskResizable);
 
-    let min_size = NSSize::new(600.0, 300.0);
+    let min_size = NSSize::new(400.0, 450.0);
     let () = unsafe { msg_send![panel, setMinSize: min_size] };
 
     // Setup delegate for an NSPanel to listen for window resign key and hide the panel
