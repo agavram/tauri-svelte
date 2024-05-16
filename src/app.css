@@ -1,3 +1,162 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+	:root {
+		--background: 240 10% 3.9%;
+		--foreground: 0 0% 98%;
+
+		--muted: 240 3.7% 10%;
+		--muted-foreground: 240 5% 64.9%;
+
+		--popover: 240 10% 3.9%;
+		--popover-foreground: 0 0% 98%;
+
+		--card: 240 10% 3.9%;
+		--card-foreground: 0 0% 98%;
+
+		--border: 240 3.7% 10%;
+		--input: 240 3.7% 10%;
+
+		--primary: 0 0% 98%;
+		--primary-foreground: 240 5.9% 10%;
+
+		--secondary: 240 3.7% 10%;
+		--secondary-foreground: 0 0% 98%;
+
+		--accent: 240 3.7% 10%;
+		--accent-foreground: 0 0% 98%;
+
+		--destructive: 0 62.8% 30.6%;
+		--destructive-foreground: 0 0% 98%;
+
+		--ring: 240 4.9% 83.9%;
+
+		--radius: 0.6rem;
+	}
+}
+
+@layer base {
+	* {
+		@apply border-border;
+	}
+	main {
+		@apply bg-background text-foreground;
+		-moz-background-clip: padding;
+		-webkit-background-clip: padding-box;
+		background-clip: padding-box;
+		overflow: hidden;
+	}
+}
+
+span[contenteditable]::before {
+	content: attr(placeholder);
+	color: hsl(var(--muted-foreground));
+	pointer-events: none;
+}
+
+html {
+	overscroll-behavior: none;
+	color-scheme: dark;
+}
+
+* {
+	scrollbar-width: thin;
+}
+
+.md pre.code {
+	@apply overflow-x-scroll;
+}
+
+.md hr {
+	margin: 0.25rem 0;
+}
+
+.md h1 {
+	@apply py-2 text-2xl font-bold;
+}
+
+.md h2 {
+	@apply py-2 text-xl font-bold;
+}
+
+.md h3 {
+	@apply py-2 text-lg font-bold;
+}
+
+.md h4 {
+	@apply py-2 text-base font-bold;
+}
+
+.md h5 {
+	@apply py-2 text-sm font-bold;
+}
+
+.md h6 {
+	@apply py-2 text-xs font-bold;
+}
+
+.md ul {
+	@apply flex list-disc flex-col gap-2 py-2 pl-4;
+}
+
+.md ol {
+	@apply flex list-decimal flex-col gap-2 py-2 pl-4;
+}
+
+.md li {
+	@apply [&>ol]:pt-2 [&>ul]:pt-2;
+}
+
+.md a {
+	@apply underline;
+}
+
+.md a:hover {
+	@apply text-[#2dd9da];
+}
+
+.md blockquote {
+	@apply border-l-4 border-accent p-2 pl-3;
+}
+
+blockquote p {
+	@apply m-0;
+}
+
+.md table {
+	@apply w-full;
+}
+
+.md thead {
+	@apply border border-border;
+}
+
+.md th {
+	@apply font-bold;
+}
+
+.md td {
+	@apply border border-border;
+}
+
+.md img {
+	@apply w-full max-w-80;
+}
+
+.md code {
+	@apply rounded-md bg-muted p-1;
+}
+
+.md pre {
+	@apply my-2 inline-block rounded-md bg-muted p-4;
+}
+
+.md pre code {
+	@apply p-0;
+}
+
+.md hr {
+	@apply h-[2px] w-full bg-muted border-0;
+}

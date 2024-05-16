@@ -474,7 +474,7 @@ fn create_spotlight_panel(window: &Window<Wry>) -> ShareId<RawNSPanel> {
     let panel = panel.share();
 
     #[cfg(target_os = "macos")]
-    apply_vibrancy(&w, NSVisualEffectMaterial::HudWindow, None, Some(10.0))
+    apply_vibrancy(&w, NSVisualEffectMaterial::ContentBackground, None, Some(10.0))
         .expect("Unsupported platform! 'apply_vibrancy' is only supported on macOS");
 
     // Set panel above the main menu window level
