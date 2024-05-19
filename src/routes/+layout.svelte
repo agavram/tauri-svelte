@@ -28,7 +28,9 @@
 			appWindow.startDragging()
 		}}
 	></button>
-	<div class="flex flex-grow flex-col justify-between h-full overflow-hidden pb-4">
+	<div
+		class="mx-auto flex h-full w-full max-w-screen-md flex-grow flex-col justify-between overflow-hidden pb-1"
+	>
 		<slot />
 	</div>
 </main>

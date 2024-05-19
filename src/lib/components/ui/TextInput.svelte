@@ -1,15 +1,12 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte'
-	import { pending } from '$lib/text.store.js'
 
-	let message = ''
+	export let onSubmit: (s: string) => void
+	export let pending: boolean
+
+	export let message = ''
 	let input: HTMLSpanElement
 	let savedRange: Range | undefined
-	let loadingResponse = false
-
-	pending.subscribe((value) => {
-		loadingResponse = !!value
-	})
 
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.key === 'Enter' && !event.shiftKey) {
@@ -20,45 +17,44 @@
 	}
 
 	function handleSubmit() {
-		if (loadingResponse) {
+		if (pending) {
 			return
 		}
 
 		if (message.trim()) {
-			pending.set(message.trim())
+			onSubmit(message.trim())
 			message = ''
 		}
 	}
 
 	onMount(() => {
-		console.log('mounted')
 		const handleSlash = (event: KeyboardEvent) => {
 			if (event.key === '/' && event.target === document.body) {
 				input.focus()
 				event.preventDefault()
 			}
 		}
-		const handleFocus = () => {
-			console.log('grabbed focus')
+		const handleFocus = async () => {
 			if (!input.focus) {
 				return
 			}
 
+			input.focus()
 			if (savedRange) {
 				let selection = window.getSelection()
+
 				selection?.removeAllRanges()
 				selection?.addRange(savedRange)
-				return
+			} else {
+				let range = document.createRange()
+				let selection = window.getSelection()
+
+				range.selectNodeContents(input)
+				range.collapse(false)
+
+				selection?.removeAllRanges()
+				selection?.addRange(range)
 			}
-
-			let range = document.createRange()
-			let selection = window.getSelection()
-
-			range.selectNodeContents(input)
-			range.collapse(false)
-
-			selection?.removeAllRanges()
-			selection?.addRange(range)
 		}
 		const getRange = () => {
 			let selection = window.getSelection()
@@ -85,25 +81,30 @@
 	})
 </script>
 
-<form on:submit|preventDefault={handleSubmit} class="relative z-10 flex flex-row px-4">
+<form on:submit|preventDefault={handleSubmit} class="relative w-full">
 	<span
-		class="block max-h-44 min-h-3 w-full overflow-y-scroll rounded-md border border-input bg-transparent px-3 py-2 pr-10 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+		class="block max-h-44 min-h-3 w-full overflow-y-scroll rounded-md border border-input bg-transparent px-3 py-2 pr-10 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
 		role="textbox"
 		bind:this={input}
 		tabindex="0"
-		placeholder={!message || message === '\n' ? 'Send a message' : ''}
 		on:keydown={handleKeyDown}
 		contenteditable="plaintext-only"
 		bind:innerText={message}
 	>
 	</span>
-	{#if loadingResponse}
+	{#if !message || message === '\n'}
+		<span
+			class="pointer-events-none absolute left-[13px] top-1/2 -translate-y-1/2 transform text-sm text-muted-foreground"
+			>Send a message</span
+		>
+	{/if}
+	{#if !!pending}
 		<svg
 			width="24"
 			height="24"
 			viewBox="0 0 24 24"
 			xmlns="http://www.w3.org/2000/svg"
-			class="absolute bottom-[8px] right-6 fill-foreground"
+			class="absolute bottom-[8px] right-2 fill-foreground"
 			><style>
 				.spinner_P7sC {
 					transform-origin: center;
@@ -121,23 +122,18 @@
 			/></svg
 		>
 	{:else}
-		<button on:click={handleSubmit}>
+		<button on:click={handleSubmit} class="absolute bottom-2 right-2">
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
-				width="24"
-				height="24"
+				width="20"
+				height="20"
 				viewBox="0 0 24 24"
 				fill="none"
+				stroke="currentColor"
 				stroke-width="2"
 				stroke-linecap="round"
 				stroke-linejoin="round"
-				class="feather feather-arrow-up-circle absolute bottom-[8px] right-6 stroke-foreground"
-				><circle cx="12" cy="12" r="10"></circle><polyline points="16 12 12 8 8 12"></polyline><line
-					x1="12"
-					y1="16"
-					x2="12"
-					y2="8"
-				></line></svg
+				class="lucide lucide-send"><path d="m22 2-7 20-4-9-9-4Z" /><path d="M22 2 11 13" /></svg
 			>
 		</button>
 	{/if}

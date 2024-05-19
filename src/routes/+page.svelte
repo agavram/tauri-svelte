@@ -1,12 +1,23 @@
 <script lang="ts">
-	import TextInput from '$lib/components/ui/TextInput.svelte'
 	import Chat from '$lib/components/ui/Chat.svelte'
+	import { onMount } from 'svelte'
+	import { selectedConversation } from '$lib/text.store'
+
+	const handleKeyDown = (event: KeyboardEvent) => {
+		if (event.metaKey && event.key === 't') {
+			selectedConversation.set(new Date().getTime())
+		}
+	}
+
+	onMount(() => {
+		window.addEventListener('keydown', handleKeyDown)
+		return () => window.removeEventListener('keydown', handleKeyDown)
+	})
 </script>
 
 <svelte:head>
-	<title>Home</title>
-	<meta name="description" content="Svelte demo app" />
+	<title>Chat</title>
+	<meta name="description" content="Chat with LLMs" />
 </svelte:head>
 
-<Chat />
-<TextInput />
+<Chat id={$selectedConversation} />

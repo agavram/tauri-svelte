@@ -150,13 +150,17 @@ blockquote p {
 }
 
 .md pre {
-	@apply my-2 inline-block rounded-md bg-muted p-4;
+	@apply my-2 rounded-md bg-muted p-4 overflow-x-scroll;
 }
 
 .md pre code {
 	@apply p-0;
 }
 
+.md p {
+	@apply my-1;
+}
+
 .md hr {
-	@apply h-[2px] w-full bg-muted border-0;
+	@apply h-[2px] w-full border-0 bg-muted;
 }
