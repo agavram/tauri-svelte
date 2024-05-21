@@ -8,6 +8,6 @@
 	export { className as class }
 </script>
 
-<div class={cn('break-words text-sm [&_p]:leading-relaxed', className)} {...$$restProps}>
+<div class={cn('inline-block break-words text-sm [&_p]:leading-relaxed', className)} {...$$restProps}>
 	<slot />
 </div>

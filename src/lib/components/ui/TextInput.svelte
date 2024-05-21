@@ -1,12 +1,13 @@
 <script lang="ts">
+	import autosize from 'autosize'
 	import { onMount, tick } from 'svelte'
 
 	export let onSubmit: (s: string) => void
 	export let pending: boolean
 
-	export let message = ''
-	let input: HTMLSpanElement
-	let savedRange: Range | undefined
+	let message = ''
+	let input: HTMLTextAreaElement
+	let savedRange: [number, number] | undefined
 
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.key === 'Enter' && !event.shiftKey) {
@@ -28,8 +29,9 @@
 	}
 
 	onMount(() => {
+		autosize(input)
 		const handleSlash = (event: KeyboardEvent) => {
-			if (event.key === '/' && event.target === document.body) {
+			if (event.key === '/' || (event.key === 'l' && event.metaKey)) {
 				input.focus()
 				event.preventDefault()
 			}
@@ -39,27 +41,16 @@
 				return
 			}
 
-			input.focus()
 			if (savedRange) {
-				let selection = window.getSelection()
-
-				selection?.removeAllRanges()
-				selection?.addRange(savedRange)
+				input.setSelectionRange(...savedRange)
 			} else {
-				let range = document.createRange()
-				let selection = window.getSelection()
-
-				range.selectNodeContents(input)
-				range.collapse(false)
-
-				selection?.removeAllRanges()
-				selection?.addRange(range)
+				input.setSelectionRange(input.value.length, input.value.length)
 			}
 		}
+
 		const getRange = () => {
-			let selection = window.getSelection()
-			if (selection?.focusNode?.parentNode?.contains(input)) {
-				savedRange = selection.getRangeAt(0)
+			if (document.activeElement === input) {
+				savedRange = [input.selectionStart, input.selectionEnd]
 			} else {
 				savedRange = undefined
 			}
@@ -74,6 +65,7 @@
 		})()
 
 		return () => {
+			autosize.destroy(input)
 			window.removeEventListener('keydown', handleSlash)
 			window.removeEventListener('focus', handleFocus)
 			window.removeEventListener('blur', getRange)
@@ -82,22 +74,14 @@
 </script>
 
 <form on:submit|preventDefault={handleSubmit} class="relative w-full">
-	<span
+	<textarea
 		class="block max-h-44 min-h-3 w-full overflow-y-scroll rounded-md border border-input bg-transparent px-3 py-2 pr-10 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-		role="textbox"
 		bind:this={input}
-		tabindex="0"
+		rows="1"
 		on:keydown={handleKeyDown}
-		contenteditable="plaintext-only"
-		bind:innerText={message}
-	>
-	</span>
-	{#if !message || message === '\n'}
-		<span
-			class="pointer-events-none absolute left-[13px] top-1/2 -translate-y-1/2 transform text-sm text-muted-foreground"
-			>Send a message</span
-		>
-	{/if}
+		bind:value={message}
+		placeholder="Send a message"
+	></textarea>
 	{#if !!pending}
 		<svg
 			width="24"

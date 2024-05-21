@@ -4,6 +4,9 @@
 	import { chatHistory, type DexieMessage } from '$lib/text.store.js'
 	import { md } from '$lib/utils'
 	import DOMPurify from 'dompurify'
+	import type { ChatCompletionChunk } from 'openai/resources/index.mjs'
+	import type { Stream } from 'openai/streaming.mjs'
+	import { onMount } from 'svelte'
 	import ChatMessage from './ChatMessage.svelte'
 	import SelectConversation from './SelectConversation.svelte'
 	import SelectModel from './SelectModel.svelte'
@@ -11,8 +14,8 @@
 
 	export let id: number
 	let pending = false
-	let message = ''
 	let streaming = ''
+	let stream: Stream<ChatCompletionChunk> | undefined
 
 	let history: DexieMessage[] = []
 	$: (async () => {
@@ -72,7 +75,7 @@
 					chatHistory.chats.put({ id: cid, title: title.choices[0].message.content ?? '' })
 				})()
 
-			const stream = await openai.chat.completions.create({
+			stream = await openai.chat.completions.create({
 				model: $lastModel.lastUsedId,
 				messages: history,
 				stream: true
@@ -101,8 +104,20 @@
 		} finally {
 			streaming = ''
 			pending = false
+			stream = undefined
 		}
 	}
+
+	onMount(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (e.metaKey && e.key === 'd') {
+				stream?.controller.abort()
+			}
+		}
+
+		window.addEventListener('keydown', handleKeyDown)
+		return () => window.removeEventListener('keydown', handleKeyDown)
+	})
 </script>
 
 <div class="flex flex-grow flex-col gap-2 overflow-scroll px-4 pb-4">
@@ -119,9 +134,9 @@
 </div>
 
 <div class="z-10 flex flex-col items-start gap-1 px-4">
-	<TextInput {onSubmit} {pending} bind:message />
+	<TextInput {onSubmit} {pending} />
 	<div class="flex flex-row gap-1">
-		<SelectModel />
 		<SelectConversation />
+		<SelectModel />
 	</div>
 </div>

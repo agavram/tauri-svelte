@@ -13,7 +13,9 @@
 	"dependencies": {
 		"@efstajas/svelte-stored-writable": "^0.2.0",
 		"@tauri-apps/api": "^1.5.1",
+		"@types/autosize": "^4.0.3",
 		"@types/markdown-it": "^14.1.1",
+		"autosize": "^6.0.1",
 		"bits-ui": "^0.21.7",
 		"clsx": "^2.1.1",
 		"dexie": "^4.0.4",

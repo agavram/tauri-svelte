@@ -1,7 +1,25 @@
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button'
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu'
+	import * as Select from '$lib/components/ui/select'
 	import { lastModel, openai } from '$lib/openai'
+	import { openedDialog } from '$lib/text.store'
+	import { onMount } from 'svelte'
+	import { z } from 'zod'
+
+	const setOpen = (b: boolean) => {
+		b ? openedDialog.set('SELECT-MODEL') : openedDialog.set('')
+	}
+	$: open = 'SELECT-MODEL' === $openedDialog
+
+	onMount(() => {
+		const handleKeyDown = (event: KeyboardEvent) => {
+			if (event.metaKey && event.key === 'g') {
+				setOpen(true)
+			}
+		}
+
+		window.addEventListener('keydown', handleKeyDown)
+		return () => window.removeEventListener('keydown', handleKeyDown)
+	})
 
 	let models = (async () => {
 		let retryCount = 0
@@ -20,60 +38,52 @@
 	})()
 </script>
 
-<DropdownMenu.Root>
-	<DropdownMenu.Trigger asChild let:builder>
-		<Button
-			variant="ghost"
-			class="flex h-auto flex-row justify-center gap-1 px-2 py-1 text-xs"
-			builders={[builder]}
+<Select.Root
+	{open}
+	onOpenChange={setOpen}
+	onSelectedChange={(e) => lastModel.set({ lastUsedId: z.string().parse(e?.value) })}
+>
+	<Select.Trigger class="h-auto gap-1 p-1 text-xs hover:bg-muted focus:outline-none">
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			width="12"
+			height="12"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="2"
+			stroke-linecap="round"
+			stroke-linejoin="round"
+			class="lucide lucide-cpu"
+			><rect width="16" height="16" x="4" y="4" rx="2" /><rect
+				width="6"
+				height="6"
+				x="9"
+				y="9"
+				rx="1"
+			/><path d="M15 2v2" /><path d="M15 20v2" /><path d="M2 15h2" /><path d="M2 9h2" /><path
+				d="M20 15h2"
+			/><path d="M20 9h2" /><path d="M9 2v2" /><path d="M9 20v2" /></svg
 		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				width="12"
-				height="12"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="2"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-				class="lucide lucide-cpu"
-				><rect width="16" height="16" x="4" y="4" rx="2" /><rect
-					width="6"
-					height="6"
-					x="9"
-					y="9"
-					rx="1"
-				/><path d="M15 2v2" /><path d="M15 20v2" /><path d="M2 15h2" /><path d="M2 9h2" /><path
-					d="M20 15h2"
-				/><path d="M20 9h2" /><path d="M9 2v2" /><path d="M9 20v2" /></svg
-			>
-			{$lastModel.lastUsedId}
-		</Button>
-	</DropdownMenu.Trigger>
-	<DropdownMenu.Content class="max-h-80 overflow-y-scroll">
-		<DropdownMenu.Group>
-			{#await models}
-				<DropdownMenu.Item>Loading...</DropdownMenu.Item>
-			{:then models}
-				<DropdownMenu.Label>Available Models</DropdownMenu.Label>
-				<DropdownMenu.Separator />
-				<div class="flex flex-col">
-					{#each models as model}
-						<DropdownMenu.Trigger>
-							<Button
-								variant="ghost"
-								class="w-full justify-start"
-								on:click={() => lastModel.set({ lastUsedId: model.id })}
-							>
-								{model.id}
-							</Button>
-						</DropdownMenu.Trigger>
-					{/each}
-				</div>
-			{:catch error}
-				<DropdownMenu.Item class="text-red-400">An error occurred</DropdownMenu.Item>
-			{/await}
-		</DropdownMenu.Group>
-	</DropdownMenu.Content>
-</DropdownMenu.Root>
+		{$lastModel.lastUsedId}
+	</Select.Trigger>
+	<Select.Content class="max-h-80 overflow-y-auto" sameWidth={false} align="start">
+		{#await models}
+			<Select.Item disabled value="Loading..."></Select.Item>
+		{:then models}
+			<Select.Label>Available Models</Select.Label>
+			<Select.Separator />
+			<div class="flex flex-col">
+				{#each models as model}
+					<Select.Item
+						class="inline-block w-full flex-row place-items-center overflow-hidden text-ellipsis text-nowrap"
+						value={model.id}
+						label={model.id}
+					></Select.Item>
+				{/each}
+			</div>
+		{:catch error}
+			<Select.Item class="text-red-400" disabled value="An error occurred"></Select.Item>
+		{/await}
+	</Select.Content>
+</Select.Root>

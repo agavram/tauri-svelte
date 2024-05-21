@@ -18,15 +18,14 @@
 <Alert.Root
 	class={cn(
 		'group inline-block w-fit max-w-[90%] p-1 px-2',
-		message.role === 'user' ? 'place-self-end' : ''
+		message.role === 'user' && 'place-self-end',
+		edit && 'border-foreground'
 	)}
 >
-	<Alert.Description
-		class="md rounded-sm px-1 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-	>
+	<Alert.Description class="md block rounded-sm px-1">
 		{#if edit}
 			<p
-				class="my-[5px]"
+				class="edit my-[5px] outline-none"
 				on:blur={() => {
 					edit = false
 					chatHistory.messages.update(message.id, { content: message.content })
@@ -42,7 +41,7 @@
 		{/if}
 	</Alert.Description>
 	<div
-		class="invisible absolute right-0 z-10 scale-50 opacity-0 transition ease-in-out group-hover:visible group-hover:scale-100 group-hover:opacity-100"
+		class="invisible absolute right-0 z-10 scale-50 select-none opacity-0 transition ease-in-out group-hover:visible group-hover:scale-100 group-hover:opacity-100"
 	>
 		<Alert.Root class="p-1">
 			<Alert.Description class="flex flex-row">

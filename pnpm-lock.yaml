@@ -14,9 +14,15 @@ importers:
       '@tauri-apps/api':
         specifier: ^1.5.1
         version: 1.5.5
+      '@types/autosize':
+        specifier: ^4.0.3
+        version: 4.0.3
       '@types/markdown-it':
         specifier: ^14.1.1
         version: 14.1.1
+      autosize:
+        specifier: ^6.0.1
+        version: 6.0.1
       bits-ui:
         specifier: ^0.21.7
         version: 0.21.7(svelte@4.2.17)
@@ -567,6 +573,9 @@ packages:
     engines: {node: '>= 10'}
     hasBin: true
 
+  '@types/autosize@4.0.3':
+    resolution: {integrity: sha512-o0ZyU3ePp3+KRbhHsY4ogjc+ZQWgVN5h6j8BHW5RII4cFKi6PEKK9QPAcphJVkD0dGpyFnD3VRR0WMvHVjCv9w==}
+
   '@types/cookie@0.6.0':
     resolution: {integrity: sha512-4Kh9a6B2bQciAhf7FSuMRRkUWecJgJu9nPnx3yzpsfXX/c50REIqpHY4C82bXP90qrLtXtkDxTZosYO3UpOwlA==}
 
@@ -730,6 +739,9 @@ packages:
     hasBin: true
     peerDependencies:
       postcss: ^8.1.0
+
+  autosize@6.0.1:
+    resolution: {integrity: sha512-f86EjiUKE6Xvczc4ioP1JBlWG7FKrE13qe/DxBCpe8GCipCq2nFw73aO8QEBKHfSbYGDN5eB9jXWKen7tspDqQ==}
 
   axobject-query@4.0.0:
     resolution: {integrity: sha512-+60uv1hiVFhHZeO+Lz0RYzsVHy5Wr1ayX0mwda9KPDVLNJgZ1T9Ny7VmFbLDzxsH0D87I86vgj3gFrjTJUYznw==}
@@ -2232,6 +2244,8 @@ snapshots:
       '@tauri-apps/cli-win32-ia32-msvc': 1.5.14
       '@tauri-apps/cli-win32-x64-msvc': 1.5.14
 
+  '@types/autosize@4.0.3': {}
+
   '@types/cookie@0.6.0': {}
 
   '@types/dompurify@3.0.5':
@@ -2411,6 +2425,8 @@ snapshots:
       picocolors: 1.0.1
       postcss: 8.4.38
       postcss-value-parser: 4.2.0
+
+  autosize@6.0.1: {}
 
   axobject-query@4.0.0:
     dependencies:

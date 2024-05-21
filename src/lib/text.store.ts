@@ -27,3 +27,5 @@ chatHistory.version(1).stores({
 })
 
 export const selectedConversation = writable<number>(new Date().getTime())
+
+export const openedDialog = writable<string>('')
