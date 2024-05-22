@@ -1,5 +1,6 @@
 <script lang="ts">
 	import * as Select from '$lib/components/ui/select'
+	import * as Tooltip from '$lib/components/ui/tooltip'
 	import { chatHistory, openedDialog, selectedConversation } from '$lib/text.store'
 	import { cn } from '$lib/utils'
 	import { liveQuery } from 'dexie'
@@ -30,54 +31,70 @@
 	})
 </script>
 
-<Select.Root
-	{open}
-	onOpenChange={setOpen}
-	onSelectedChange={(e) => selectedConversation.set(z.number().parse(e?.value))}
->
-	<Select.Trigger
-		id="select-conversation-trigger"
-		class="h-auto gap-1 p-1 text-xs hover:bg-muted focus:outline-none"
-		on:click={(e) => console.log(e)}
-	>
-		<svg
-			xmlns="http://www.w3.org/2000/svg"
-			width="12"
-			height="12"
-			viewBox="0 0 24 24"
-			fill="none"
-			stroke="currentColor"
-			stroke-width="2"
-			stroke-linecap="round"
-			stroke-linejoin="round"
-			class="lucide lucide-history"
-			><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /><path
-				d="M12 7v5l4 2"
-			/></svg
+<Tooltip.Root>
+	<Tooltip.Trigger>
+		<Select.Root
+			{open}
+			onOpenChange={setOpen}
+			onSelectedChange={(e) => selectedConversation.set(z.number().parse(e?.value))}
 		>
-		History
-	</Select.Trigger>
-	<Select.Content class="max-h-80 overflow-y-scroll" sameWidth={false}>
-		<Select.Label>Chat History</Select.Label>
-		<Select.Separator />
-		{#if $conversations === undefined}
-			<Select.Item disabled value="Loading..."></Select.Item>
-		{:else if $conversations.length === 0}
-			<Select.Item class="data-[highlighted]:bg-background" disabled value="No chat history"
-			></Select.Item>
-		{:else}
-			<div class="flex flex-col">
-				{#each $conversations as conversation}
-					<Select.Item
-						class={cn(
-							'relative inline w-full max-w-60 flex-row place-items-center overflow-hidden text-ellipsis whitespace-nowrap pr-2',
-							$selectedConversation === conversation.id && 'border border-muted-foreground'
-						)}
-						value={conversation.id}
-						label={conversation.title}
+			<Select.Trigger
+				id="select-conversation-trigger"
+				class="h-auto gap-1 p-1 text-xs hover:bg-muted focus:outline-none"
+				on:click={(e) => console.log(e)}
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					width="12"
+					height="12"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					class="lucide lucide-history"
+					><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /><path
+						d="M12 7v5l4 2"
+					/></svg
+				>
+				History
+			</Select.Trigger>
+			<Select.Content class="max-h-80 overflow-y-scroll" sameWidth={false}>
+				<Select.Label>Chat History</Select.Label>
+				<Select.Separator />
+				{#if $conversations === undefined}
+					<Select.Item disabled value="Loading..."></Select.Item>
+				{:else if $conversations.length === 0}
+					<Select.Item class="data-[highlighted]:bg-background" disabled value="No chat history"
 					></Select.Item>
-				{/each}
-			</div>
-		{/if}
-	</Select.Content>
-</Select.Root>
+				{:else}
+					<div class="flex flex-col">
+						{#each $conversations as conversation}
+							<Select.Item
+								class={cn(
+									'relative inline w-full max-w-60 flex-row place-items-center overflow-hidden text-ellipsis whitespace-nowrap pr-2',
+									$selectedConversation === conversation.id && 'border border-input'
+								)}
+								value={conversation.id}
+								label={conversation.title}
+							></Select.Item>
+						{/each}
+					</div>
+				{/if}
+			</Select.Content>
+		</Select.Root>
+	</Tooltip.Trigger>
+	<Tooltip.Content
+		class="z-10 flex flex-row gap-2 bg-muted px-2 text-foreground shadow shadow-background"
+	>
+		<kbd
+			class="shadow-kbd inline-flex size-5 items-center justify-center rounded-sm border border-accent bg-background text-sm"
+			>⌘</kbd
+		>
+		<kbd
+			class="shadow-kbd inline-flex size-5 items-center justify-center rounded-sm border border-accent bg-background font-mono text-sm"
+			>Y</kbd
+		>
+	</Tooltip.Content>
+</Tooltip.Root>

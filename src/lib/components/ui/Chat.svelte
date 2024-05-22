@@ -91,6 +91,26 @@
 </script>
 
 <div class="flex flex-grow flex-col gap-2 overflow-scroll px-4 pb-4">
+	{#if !$history?.length}
+		<div class="flex flex-col justify-center items-center h-full">
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				width="48"
+				height="48"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				class="lucide lucide-zap mx-auto stroke-muted-foreground"
+				><path
+					d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"
+				/></svg
+			>
+			<p class="text-center text-sm text-muted-foreground">No messages yet</p>
+		</div>
+	{/if}
 	{#each $history ?? [] as message}
 		<ChatMessage {message} />
 	{/each}

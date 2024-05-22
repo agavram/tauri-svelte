@@ -15,7 +15,8 @@ const config = {
 		},
 		extend: {
 			boxShadow: {
-				'custom-inset': 'inset -95px -0px 25px -75px hsl(var(--background))'
+				'custom-inset': 'inset -95px -0px 25px -75px hsl(var(--background))',
+				kbd: '0px 1px 0px 1px rgba(255, 255, 255, .07)'
 			},
 			colors: {
 				border: 'hsl(var(--border) / <alpha-value>)',

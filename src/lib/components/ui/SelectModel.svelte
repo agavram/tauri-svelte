@@ -1,5 +1,6 @@
 <script lang="ts">
 	import * as Select from '$lib/components/ui/select'
+	import * as Tooltip from '$lib/components/ui/tooltip'
 	import { lastModel, openai } from '$lib/openai'
 	import { openedDialog } from '$lib/text.store'
 	import { onMount, tick } from 'svelte'
@@ -43,55 +44,71 @@
 	})()
 </script>
 
-<Select.Root
-	{open}
-	onOpenChange={setOpen}
-	onSelectedChange={(e) => lastModel.set({ lastUsedId: z.string().parse(e?.value) })}
->
-	<Select.Trigger
-		id="select-model-trigger"
-		class="h-auto gap-1 p-1 text-xs hover:bg-muted focus:outline-none"
-	>
-		<svg
-			xmlns="http://www.w3.org/2000/svg"
-			width="12"
-			height="12"
-			viewBox="0 0 24 24"
-			fill="none"
-			stroke="currentColor"
-			stroke-width="2"
-			stroke-linecap="round"
-			stroke-linejoin="round"
-			class="lucide lucide-cpu"
-			><rect width="16" height="16" x="4" y="4" rx="2" /><rect
-				width="6"
-				height="6"
-				x="9"
-				y="9"
-				rx="1"
-			/><path d="M15 2v2" /><path d="M15 20v2" /><path d="M2 15h2" /><path d="M2 9h2" /><path
-				d="M20 15h2"
-			/><path d="M20 9h2" /><path d="M9 2v2" /><path d="M9 20v2" /></svg
+<Tooltip.Root>
+	<Tooltip.Trigger>
+		<Select.Root
+			{open}
+			onOpenChange={setOpen}
+			onSelectedChange={(e) => lastModel.set({ lastUsedId: z.string().parse(e?.value) })}
 		>
-		{$lastModel.lastUsedId}
-	</Select.Trigger>
-	<Select.Content class="max-h-80 overflow-y-auto" sameWidth={false} align="start">
-		{#await models}
-			<Select.Item disabled value="Loading..."></Select.Item>
-		{:then models}
-			<Select.Label>Available Models</Select.Label>
-			<Select.Separator />
-			<div class="flex flex-col">
-				{#each models as model}
-					<Select.Item
-						class="inline-block w-full flex-row place-items-center overflow-hidden text-ellipsis text-nowrap"
-						value={model.id}
-						label={model.id}
-					></Select.Item>
-				{/each}
-			</div>
-		{:catch error}
-			<Select.Item class="text-red-400" disabled value="An error occurred"></Select.Item>
-		{/await}
-	</Select.Content>
-</Select.Root>
+			<Select.Trigger
+				id="select-model-trigger"
+				class="h-auto gap-1 p-1 text-xs hover:bg-muted focus:outline-none"
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					width="12"
+					height="12"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					class="lucide lucide-cpu"
+					><rect width="16" height="16" x="4" y="4" rx="2" /><rect
+						width="6"
+						height="6"
+						x="9"
+						y="9"
+						rx="1"
+					/><path d="M15 2v2" /><path d="M15 20v2" /><path d="M2 15h2" /><path d="M2 9h2" /><path
+						d="M20 15h2"
+					/><path d="M20 9h2" /><path d="M9 2v2" /><path d="M9 20v2" /></svg
+				>
+				{$lastModel.lastUsedId}
+			</Select.Trigger>
+			<Select.Content class="max-h-80 overflow-y-auto" sameWidth={false} align="start">
+				{#await models}
+					<Select.Item disabled value="Loading..."></Select.Item>
+				{:then models}
+					<Select.Label>Available Models</Select.Label>
+					<Select.Separator />
+					<div class="flex flex-col">
+						{#each models as model}
+							<Select.Item
+								class="inline-block w-full flex-row place-items-center overflow-hidden text-ellipsis text-nowrap"
+								value={model.id}
+								label={model.id}
+							></Select.Item>
+						{/each}
+					</div>
+				{:catch error}
+					<Select.Item class="text-red-400" disabled value="An error occurred"></Select.Item>
+				{/await}
+			</Select.Content>
+		</Select.Root>
+	</Tooltip.Trigger>
+	<Tooltip.Content
+		class="z-10 flex flex-row gap-2 bg-muted px-2 text-foreground shadow shadow-background"
+	>
+		<kbd
+			class="shadow-kbd inline-flex size-5 items-center justify-center rounded-sm border border-accent bg-background text-sm"
+			>⌘</kbd
+		>
+		<kbd
+			class="shadow-kbd inline-flex size-5 items-center justify-center rounded-sm border border-accent bg-background font-mono text-sm"
+			>G</kbd
+		>
+	</Tooltip.Content>
+</Tooltip.Root>
