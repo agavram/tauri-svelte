@@ -11,26 +11,17 @@
 	import SelectConversation from './SelectConversation.svelte'
 	import SelectModel from './SelectModel.svelte'
 	import TextInput from './TextInput.svelte'
+	import { liveQuery } from 'dexie'
+	import NewConversation from './NewConversation.svelte'
 
 	export let id: number
 	let pending = false
 	let streaming = ''
 	let stream: Stream<ChatCompletionChunk> | undefined
 
-	let history: DexieMessage[] = []
-	$: (async () => {
-		const cid = id
-		let messages: DexieMessage[] = []
-
-		if ((await chatHistory.chats.where({ id: cid }).count()) === 1) {
-			messages = await chatHistory.messages.where({ cid }).toArray()
-		}
-		history = []
-
-		if (cid == id) {
-			history = [...messages]
-		}
-	})()
+	$: history = liveQuery<DexieMessage[] | undefined>(() =>
+		chatHistory.messages.where({ cid: id }).toArray()
+	)
 
 	const onSubmit = async (query: string) => {
 		if (pending) {
@@ -38,46 +29,37 @@
 		}
 		const cid = id
 		pending = true
+		const copy = [...($history ?? [])]
 
 		try {
-			if (!history.length) {
-				await chatHistory.chats.add({ id: cid, title: new Date(cid).toLocaleString() })
-			}
+			copy.push({
+				role: 'user',
+				content: query,
+				cid,
+				id: await chatHistory.messages.add({ cid, content: query, role: 'user' } as DexieMessage)
+			})
 
-			history = [
-				...history,
-				{
-					role: 'user',
-					content: query,
-					id: await chatHistory.messages.add({
-						cid,
-						content: query,
-						role: 'user'
-					} as DexieMessage),
-					cid
-				}
-			]
-
-			history.length === 1 &&
+			copy.length === 1 &&
 				(async () => {
 					const title = await openai.chat.completions.create({
 						model: $lastModel.lastUsedId,
 						messages: [
-							...history,
+							...copy,
 							{
 								role: 'system',
 								content:
-									'You are tasked with generating a title for the above conversation. Generate one in 4 words or fewer. Do NOT respond to the user as you are an outside observer'
+									'You are tasked with generating a title for the above conversation.' +
+									'Generate one in 4 words or fewer. Do NOT respond to the user since you are an outside observer'
 							}
 						]
 					})
 
-					chatHistory.chats.put({ id: cid, title: title.choices[0].message.content ?? '' })
+					chatHistory.chats.add({ id: cid, title: title.choices[0].message.content ?? '' })
 				})()
 
 			stream = await openai.chat.completions.create({
 				model: $lastModel.lastUsedId,
-				messages: history,
+				messages: copy,
 				stream: true
 			})
 
@@ -88,19 +70,7 @@
 				streaming += chunk.choices[0]?.delta?.content ?? ''
 			}
 
-			history = [
-				...history,
-				{
-					role: 'assistant',
-					content: streaming,
-					id: await chatHistory.messages.add({
-						cid,
-						content: streaming,
-						role: 'assistant'
-					} as DexieMessage),
-					cid
-				}
-			]
+			await chatHistory.messages.add({ cid, content: streaming, role: 'assistant' } as DexieMessage)
 		} finally {
 			streaming = ''
 			pending = false
@@ -121,12 +91,12 @@
 </script>
 
 <div class="flex flex-grow flex-col gap-2 overflow-scroll px-4 pb-4">
-	{#each history as message}
+	{#each $history ?? [] as message}
 		<ChatMessage {message} />
 	{/each}
 	{#if streaming}
-		<Alert.Root class="inline-block w-fit max-w-[90%] p-1 px-3">
-			<Alert.Description class="md">
+		<Alert.Root class={'group inline-block w-fit max-w-[90%] p-1 px-2'}>
+			<Alert.Description class="md block rounded-sm px-1">
 				{@html DOMPurify.sanitize(md.render(streaming))}
 			</Alert.Description>
 		</Alert.Root>
@@ -136,6 +106,7 @@
 <div class="z-10 flex flex-col items-start gap-1 px-4">
 	<TextInput {onSubmit} {pending} />
 	<div class="flex flex-row gap-1">
+		<NewConversation />
 		<SelectConversation />
 		<SelectModel />
 	</div>

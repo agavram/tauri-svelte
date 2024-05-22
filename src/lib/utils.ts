@@ -3,8 +3,21 @@ import { twMerge } from 'tailwind-merge'
 import { cubicOut } from 'svelte/easing'
 import type { TransitionConfig } from 'svelte/transition'
 import markdownIt from 'markdown-it'
+import hljs from 'highlight.js'
 
-export const md = markdownIt()
+export const md = markdownIt({
+	highlight: function (str, lang) {
+		if (lang && hljs.getLanguage(lang)) {
+			try {
+				return hljs.highlight(str, { language: lang }).value
+			} catch (e) {
+				console.error(e)
+			}
+		}
+
+		return '' // use external default escaping
+	}
+})
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs))

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { invoke } from '@tauri-apps/api'
 	import autosize from 'autosize'
 	import { onMount, tick } from 'svelte'
 
@@ -30,7 +31,11 @@
 
 	onMount(() => {
 		autosize(input)
-		const handleSlash = (event: KeyboardEvent) => {
+		const handleKeydown = (event: KeyboardEvent) => {
+			if (document.activeElement === input) {
+				return
+			}
+
 			if (event.key === '/' || (event.key === 'l' && event.metaKey)) {
 				input.focus()
 				event.preventDefault()
@@ -56,7 +61,7 @@
 			}
 		}
 
-		window.addEventListener('keydown', handleSlash)
+		window.addEventListener('keydown', handleKeydown)
 		window.addEventListener('focus', handleFocus)
 		window.addEventListener('blur', getRange)
 		;(async () => {
@@ -66,7 +71,7 @@
 
 		return () => {
 			autosize.destroy(input)
-			window.removeEventListener('keydown', handleSlash)
+			window.removeEventListener('keydown', handleKeydown)
 			window.removeEventListener('focus', handleFocus)
 			window.removeEventListener('blur', getRange)
 		}

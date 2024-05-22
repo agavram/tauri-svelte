@@ -1,24 +1,10 @@
 <script lang="ts">
 	import { invoke } from '@tauri-apps/api/tauri'
 	import { appWindow } from '@tauri-apps/api/window'
-	import { onMount } from 'svelte'
 	import '../app.css'
+	import 'highlight.js/styles/stackoverflow-dark.min.css'
 
 	invoke('init_spotlight_window')
-
-	onMount(() => {
-		const handleEscape = (event: KeyboardEvent) => {
-			if (event.key === 'Escape') {
-				event.preventDefault()
-				invoke('hide_spotlight')
-			}
-		}
-		window.addEventListener('keydown', handleEscape)
-
-		return () => {
-			window.removeEventListener('keydown', handleEscape)
-		}
-	})
 </script>
 
 <main class="flex h-screen flex-col rounded-md border-2 border-zinc-900">

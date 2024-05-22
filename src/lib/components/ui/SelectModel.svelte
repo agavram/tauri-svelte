@@ -2,18 +2,23 @@
 	import * as Select from '$lib/components/ui/select'
 	import { lastModel, openai } from '$lib/openai'
 	import { openedDialog } from '$lib/text.store'
-	import { onMount } from 'svelte'
+	import { onMount, tick } from 'svelte'
 	import { z } from 'zod'
 
-	const setOpen = (b: boolean) => {
+	const setOpen = async (b: boolean) => {
 		b ? openedDialog.set('SELECT-MODEL') : openedDialog.set('')
+		const content = document.querySelector('#select-model-trigger')
+		await tick()
+		if (content instanceof HTMLButtonElement) {
+			b ? content.focus() : content.blur()
+		}
 	}
 	$: open = 'SELECT-MODEL' === $openedDialog
 
 	onMount(() => {
 		const handleKeyDown = (event: KeyboardEvent) => {
 			if (event.metaKey && event.key === 'g') {
-				setOpen(true)
+				setOpen(!open)
 			}
 		}
 
@@ -43,7 +48,10 @@
 	onOpenChange={setOpen}
 	onSelectedChange={(e) => lastModel.set({ lastUsedId: z.string().parse(e?.value) })}
 >
-	<Select.Trigger class="h-auto gap-1 p-1 text-xs hover:bg-muted focus:outline-none">
+	<Select.Trigger
+		id="select-model-trigger"
+		class="h-auto gap-1 p-1 text-xs hover:bg-muted focus:outline-none"
+	>
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
 			width="12"

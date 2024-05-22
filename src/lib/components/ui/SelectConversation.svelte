@@ -3,11 +3,16 @@
 	import { chatHistory, openedDialog, selectedConversation } from '$lib/text.store'
 	import { cn } from '$lib/utils'
 	import { liveQuery } from 'dexie'
-	import { onMount } from 'svelte'
+	import { onMount, tick } from 'svelte'
 	import { z } from 'zod'
 
-	const setOpen = (b: boolean) => {
+	const setOpen = async (b: boolean) => {
 		b ? openedDialog.set('SELECT-CONVERSATION') : openedDialog.set('')
+		const content = document.querySelector('#select-conversation-trigger')
+		await tick()
+		if (content instanceof HTMLButtonElement) {
+			b ? content.focus() : content.blur()
+		}
 	}
 	$: open = 'SELECT-CONVERSATION' === $openedDialog
 
@@ -16,7 +21,7 @@
 	onMount(() => {
 		const handleKeyDown = (event: KeyboardEvent) => {
 			if (event.metaKey && event.key === 'y') {
-				setOpen(true)
+				setOpen(!open)
 			}
 		}
 
@@ -31,6 +36,7 @@
 	onSelectedChange={(e) => selectedConversation.set(z.number().parse(e?.value))}
 >
 	<Select.Trigger
+		id="select-conversation-trigger"
 		class="h-auto gap-1 p-1 text-xs hover:bg-muted focus:outline-none"
 		on:click={(e) => console.log(e)}
 	>

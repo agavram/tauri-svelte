@@ -25,7 +25,7 @@
 	<Alert.Description class="md block rounded-sm px-1">
 		{#if edit}
 			<p
-				class="edit my-[5px] outline-none"
+				class="edit my-[5px] w-full outline-none"
 				on:blur={() => {
 					edit = false
 					chatHistory.messages.update(message.id, { content: message.content })
@@ -144,7 +144,11 @@
 						/></svg
 					>
 				</Button>
-				<Button variant="ghost" class="h-auto p-2">
+				<Button
+					variant="ghost"
+					class="h-auto p-2"
+					on:click={() => chatHistory.messages.delete(message.id)}
+				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						width="14"
