@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { invoke } from '@tauri-apps/api'
 	import autosize from 'autosize'
 	import { onMount, tick } from 'svelte'
 
@@ -15,6 +14,10 @@
 			event.preventDefault()
 			handleSubmit()
 			input.focus()
+			;(async () => {
+				await tick()
+				autosize.update(input)
+			})()
 		}
 	}
 

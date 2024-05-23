@@ -61,7 +61,9 @@
 				"center": true,
 				"visible": false,
 				"transparent": true,
-				"maximizable": false
+				"maximizable": false,
+				"height": 700,
+				"width": 600
 			}
 		]
 	}

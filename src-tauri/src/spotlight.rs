@@ -4,17 +4,17 @@ use bitflags::bitflags;
 
 use objc_id::{Id, ShareId};
 use tauri::{
-    AppHandle, GlobalShortcutManager, Manager, PhysicalPosition, PhysicalSize, Runtime, Window, Wry,
+    AppHandle, GlobalShortcutManager, Manager, PhysicalPosition, PhysicalSize, Window, Wry,
 };
 use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial};
 
 use cocoa::{
     appkit::{
         CGFloat, NSColor, NSMainMenuWindowLevel, NSView, NSViewHeightSizable, NSViewWidthSizable,
-        NSWindow, NSWindowCollectionBehavior,
+        NSWindowCollectionBehavior,
     },
     base::{id, nil, BOOL, NO, YES},
-    foundation::{NSPoint, NSRect, NSSize},
+    foundation::{NSPoint, NSRect, NSSize, NSString},
 };
 use objc::{
     class,
@@ -42,6 +42,12 @@ bitflags! {
 #[derive(Default)]
 pub struct Store {
     panel: Option<ShareId<RawNSPanel>>,
+    monitors: std::collections::HashMap<String, WindowState>,
+}
+
+struct WindowState {
+    pub size: PhysicalSize<u32>,
+    pub position: PhysicalPosition<i32>,
 }
 
 #[derive(Default)]
@@ -124,25 +130,6 @@ macro_rules! nsstring_to_string {
     }};
 }
 
-pub struct MyWindow<R: Runtime> {
-    inner: Window<R>,
-}
-
-impl MyWindow<Wry> {
-    pub fn new(inner: Window<Wry>) -> Self {
-        Self { inner }
-    }
-
-    pub fn is_maximized(&self) -> bool {
-        false
-    }
-
-    // Forward all other methods to the inner Window
-    pub fn inner(&self) -> &Window {
-        &self.inner
-    }
-}
-
 static INIT: Once = Once::new();
 static PANEL_LABEL: &str = "main";
 
@@ -188,15 +175,56 @@ fn position_window_at_the_center_of_the_monitor_with_cursor(window: &Window<Wry>
         let handle: id = window.ns_window().unwrap() as _;
         let win_frame: NSRect = unsafe { NSView::frame(handle) };
         let size = NSSize::new(win_frame.size.width, win_frame.size.height);
-        let rect = NSRect {
-            origin: NSPoint {
-                x: win_frame.origin.x,
-                y: win_frame.origin.y,
-            },
+
+        let origin = NSPoint {
+            x: win_frame.origin.x,
+            y: win_frame.origin.y,
+        };
+
+        let mut rect = NSRect {
+            origin: origin,
             size: size,
         };
+
+        if !is_origin_visible(origin) {
+            println!("Not visible!");
+            let display_size = monitor.size.to_logical::<f64>(monitor.scale_factor);
+            let display_pos = monitor.position.to_logical::<f64>(monitor.scale_factor);
+            let size = NSSize::new(600.0, 700.0);
+
+            rect = NSRect {
+                origin: NSPoint {
+                    x: (display_pos.x + (display_size.width / 2.0)) - (size.width / 2.0),
+                    y: (display_pos.y + (display_size.height / 2.0)) - (size.height / 2.0),
+                },
+                size: size,
+            };
+        }
+
         let _: () = unsafe { msg_send![handle, setFrame: rect display: YES] };
     }
+}
+
+fn is_origin_visible(origin: NSPoint) -> bool {
+    objc::rc::autoreleasepool(|| {
+        let screens: id = unsafe { msg_send![class!(NSScreen), screens] };
+        let screens_iter: id = unsafe { msg_send![screens, objectEnumerator] };
+        let mut next_screen: id;
+
+        loop {
+            next_screen = unsafe { msg_send![screens_iter, nextObject] };
+            if next_screen == nil {
+                break;
+            }
+
+            let frame: NSRect = unsafe { msg_send![next_screen, frame] };
+            let is_mouse_in_screen_frame: BOOL = unsafe { NSMouseInRect(origin, frame, NO) };
+            if is_mouse_in_screen_frame == YES {
+                return true;
+            }
+        }
+        return false;
+    })
 }
 
 struct Monitor {
@@ -231,12 +259,16 @@ fn get_monitor_with_cursor() -> Option<Monitor> {
 
         if let Some(frame) = frame_with_cursor {
             let name: id = unsafe { msg_send![next_screen, localizedName] };
-            let screen_name = nsstring_to_string!(name);
+            let device_description: id = unsafe { msg_send![next_screen, deviceDescription] };
+            let screen_number: id = unsafe {
+                msg_send![device_description, objectForKey: NSString::alloc(nil).init_str("NSScreenNumber")]
+            };
+            let screen_number: i32 = unsafe { msg_send![screen_number, intValue] };
             let scale_factor: CGFloat = unsafe { msg_send![next_screen, backingScaleFactor] };
             let scale_factor: f64 = scale_factor;
 
             return Some(Monitor {
-                name: screen_name,
+                name: Some(screen_number.to_string()),
                 position: PhysicalPosition {
                     x: (frame.origin.x * scale_factor) as i32,
                     y: (frame.origin.y * scale_factor) as i32,

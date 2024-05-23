@@ -15,7 +15,7 @@
 		}}
 	></button>
 	<div
-		class="mx-auto flex h-full w-full max-w-screen-md flex-grow flex-col justify-between overflow-hidden pb-1"
+		class="mx-auto flex h-full w-full max-w-screen-lg flex-grow flex-col justify-between overflow-hidden pb-1"
 	>
 		<slot />
 	</div>

@@ -41,7 +41,6 @@
 			<Select.Trigger
 				id="select-conversation-trigger"
 				class="h-auto gap-1 p-1 text-xs hover:bg-muted focus:outline-none"
-				on:click={(e) => console.log(e)}
 			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -89,11 +88,11 @@
 		class="z-10 flex flex-row gap-2 bg-muted px-2 text-foreground shadow shadow-background"
 	>
 		<kbd
-			class="shadow-kbd inline-flex size-5 items-center justify-center rounded-sm border border-accent bg-background text-sm"
+			class="inline-flex size-5 items-center justify-center rounded-sm border border-accent bg-background text-sm shadow-kbd"
 			>⌘</kbd
 		>
 		<kbd
-			class="shadow-kbd inline-flex size-5 items-center justify-center rounded-sm border border-accent bg-background font-mono text-sm"
+			class="inline-flex size-5 items-center justify-center rounded-sm border border-accent bg-background font-mono text-sm shadow-kbd"
 			>Y</kbd
 		>
 	</Tooltip.Content>

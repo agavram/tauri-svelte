@@ -6,7 +6,7 @@
 	import DOMPurify from 'dompurify'
 	import type { ChatCompletionChunk } from 'openai/resources/index.mjs'
 	import type { Stream } from 'openai/streaming.mjs'
-	import { onMount } from 'svelte'
+	import { onMount, tick } from 'svelte'
 	import ChatMessage from './ChatMessage.svelte'
 	import SelectConversation from './SelectConversation.svelte'
 	import SelectModel from './SelectModel.svelte'
@@ -18,6 +18,7 @@
 	let pending = false
 	let streaming = ''
 	let stream: Stream<ChatCompletionChunk> | undefined
+	let scrollContainer: HTMLDivElement
 
 	$: history = liveQuery<DexieMessage[] | undefined>(() =>
 		chatHistory.messages.where({ cid: id }).toArray()
@@ -84,15 +85,27 @@
 				stream?.controller.abort()
 			}
 		}
+		const onfocus = () => {
+			scrollContainer.style.overflow = 'scroll'
+		}
+		const onblur = () => {
+			scrollContainer.style.overflow = 'clip'
+		}
 
 		window.addEventListener('keydown', handleKeyDown)
-		return () => window.removeEventListener('keydown', handleKeyDown)
+		window.addEventListener('focus', onfocus)
+		window.addEventListener('blur', onblur)
+		return () => {
+			window.removeEventListener('keydown', handleKeyDown)
+			window.removeEventListener('focus', onfocus)
+			window.removeEventListener('blur', onblur)
+		}
 	})
 </script>
 
-<div class="flex flex-grow flex-col gap-2 overflow-scroll px-4 pb-4">
+<div bind:this={scrollContainer} class="flex flex-grow flex-col gap-2 overflow-scroll px-4 pb-4">
 	{#if !$history?.length}
-		<div class="flex flex-col justify-center items-center h-full">
+		<div class="flex h-full flex-col items-center justify-center">
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
 				width="48"
