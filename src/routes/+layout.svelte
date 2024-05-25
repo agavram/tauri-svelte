@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { invoke } from '@tauri-apps/api/tauri'
 	import { appWindow } from '@tauri-apps/api/window'
-	import '../app.css'
 	import 'highlight.js/styles/stackoverflow-dark.min.css'
+	import '../app.css'
 
 	invoke('init_spotlight_window')
 </script>

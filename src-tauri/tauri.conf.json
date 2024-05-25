@@ -13,7 +13,18 @@
 	"tauri": {
 		"macOSPrivateApi": true,
 		"allowlist": {
-			"all": true
+			"globalShortcut": {
+				"all": true
+			},
+			"window": {
+				"all": true
+			},
+			"clipboard": {
+				"writeText": true
+			}
+		},
+		"systemTray": {
+			"iconPath": "icons/icon.png"
 		},
 		"bundle": {
 			"active": true,
@@ -30,7 +41,7 @@
 				"icons/icon.icns",
 				"icons/icon.ico"
 			],
-			"identifier": "com.tauri.dev",
+			"identifier": "com.agavram.dev",
 			"longDescription": "",
 			"macOS": {
 				"entitlements": null,
@@ -40,13 +51,8 @@
 				"signingIdentity": null
 			},
 			"resources": [],
-			"shortDescription": "",
-			"targets": "all",
-			"windows": {
-				"certificateThumbprint": null,
-				"digestAlgorithm": "sha256",
-				"timestampUrl": ""
-			}
+			"shortDescription": "An LLM chat application",
+			"targets": "app"
 		},
 		"security": {
 			"csp": null

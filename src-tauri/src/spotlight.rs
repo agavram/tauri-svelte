@@ -10,7 +10,7 @@ use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial};
 
 use cocoa::{
     appkit::{
-        CGFloat, NSColor, NSMainMenuWindowLevel, NSView, NSViewHeightSizable, NSViewWidthSizable,
+        CGFloat, NSColor, NSView, NSViewHeightSizable, NSViewWidthSizable,
         NSWindowCollectionBehavior,
     },
     base::{id, nil, BOOL, NO, YES},
@@ -42,12 +42,6 @@ bitflags! {
 #[derive(Default)]
 pub struct Store {
     panel: Option<ShareId<RawNSPanel>>,
-    monitors: std::collections::HashMap<String, WindowState>,
-}
-
-struct WindowState {
-    pub size: PhysicalSize<u32>,
-    pub position: PhysicalPosition<i32>,
 }
 
 #[derive(Default)]
@@ -258,7 +252,7 @@ fn get_monitor_with_cursor() -> Option<Monitor> {
         };
 
         if let Some(frame) = frame_with_cursor {
-            let name: id = unsafe { msg_send![next_screen, localizedName] };
+            let _: id = unsafe { msg_send![next_screen, localizedName] };
             let device_description: id = unsafe { msg_send![next_screen, deviceDescription] };
             let screen_number: id = unsafe {
                 msg_send![device_description, objectForKey: NSString::alloc(nil).init_str("NSScreenNumber")]
@@ -381,10 +375,6 @@ impl RawNSPanel {
         }
     }
 
-    fn set_level(&self, level: i32) {
-        let _: () = unsafe { msg_send![self, setLevel: level] };
-    }
-
     fn set_auto_hide(&self, value: bool) {
         let _: () = unsafe { msg_send![self, setAutoHide: value] };
     }
@@ -498,7 +488,7 @@ impl RawNSPanelDelegate {
 fn create_spotlight_panel(window: &Window<Wry>) -> ShareId<RawNSPanel> {
     // Convert NSWindow Object to NSPanel
     let handle: id = window.ns_window().unwrap() as _;
-    let w = window.get_window("main").unwrap();
+    let w = window.get_window(PANEL_LABEL).unwrap();
     let panel = RawNSPanel::from(handle);
     let panel = panel.share();
 
@@ -510,9 +500,6 @@ fn create_spotlight_panel(window: &Window<Wry>) -> ShareId<RawNSPanel> {
         Some(10.0),
     )
     .expect("Unsupported platform! 'apply_vibrancy' is only supported on macOS");
-
-    // Set panel above the main menu window level
-    panel.set_level(NSMainMenuWindowLevel + 1);
 
     panel.set_auto_hide(true);
 
@@ -544,7 +531,7 @@ fn create_spotlight_panel(window: &Window<Wry>) -> ShareId<RawNSPanel> {
         let _: () = msg_send![panel, setBackgroundColor: clear_color];
         let _: () = msg_send![panel, setOpaque: NO];
         let () = msg_send![view, setWantsLayer: YES];
-        let layer: id = msg_send![view, layer];
+        let _: id = msg_send![view, layer];
     }
 
     let bound: NSRect = unsafe { NSView::bounds(view) };
