@@ -2,7 +2,7 @@
 	import * as Alert from '$lib/components/ui/alert'
 	import { chatHistory, type DexieMessage } from '$lib/text.store'
 	import { cn, md } from '$lib/utils'
-	import { writeText } from '@tauri-apps/api/clipboard'
+	import { writeText } from '@tauri-apps/plugin-clipboard-manager'
 	import DOMPurify from 'dompurify'
 	import gsap from 'gsap'
 	import { tick } from 'svelte'

@@ -130,7 +130,7 @@
 		</Tooltip.Content>
 	</Tooltip.Root>
 	<Dialog.Content class="sm:max-w-lg">
-		<Dialog.Header>
+		<Dialog.Header class="place-items-start">
 			<Dialog.Title>Settings</Dialog.Title>
 			<Dialog.Description>
 				Make edits to your OpenAI API Key and model temperature
@@ -188,7 +188,7 @@
 				</div>
 			</div>
 			<Dialog.Footer>
-				<Button name="submit" class={cn('relative w-32', errored && 'animate-shake')} type="submit">
+				<Button name="submit" class={cn('relative w-32 place-self-end', errored && 'animate-shake')} type="submit">
 					{#if submitted}
 						<svg
 							class="absolute"

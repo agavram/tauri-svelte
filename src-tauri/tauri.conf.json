@@ -3,63 +3,45 @@
 	"build": {
 		"beforeBuildCommand": "pnpm run build",
 		"beforeDevCommand": "pnpm run dev",
-		"devPath": "http://localhost:5173",
-		"distDir": "../build"
+		"frontendDist": "../build",
+		"devUrl": "http://localhost:5173"
 	},
-	"package": {
-		"productName": "tauri-svelte",
-		"version": "0.1.0"
-	},
-	"tauri": {
-		"macOSPrivateApi": true,
-		"allowlist": {
-			"globalShortcut": {
-				"all": true
-			},
-			"window": {
-				"all": true
-			},
-			"clipboard": {
-				"writeText": true
-			}
+	"bundle": {
+		"active": true,
+		"category": "DeveloperTool",
+		"copyright": "",
+		"shortDescription": "An LLM chat application",
+		"externalBin": [],
+		"icon": [
+			"icons/32x32.png",
+			"icons/128x128.png",
+			"icons/128x128@2x.png",
+			"icons/icon.icns",
+			"icons/icon.ico"
+		],
+		"targets": "app",
+		"longDescription": "",
+		"macOS": {
+			"entitlements": null,
+			"exceptionDomain": "",
+			"frameworks": [],
+			"providerShortName": null,
+			"signingIdentity": null
 		},
-		"systemTray": {
-			"iconPath": "icons/icon.png"
-		},
-		"bundle": {
-			"active": true,
-			"category": "DeveloperTool",
-			"copyright": "",
+		"resources": [],
+		"linux": {
 			"deb": {
 				"depends": []
-			},
-			"externalBin": [],
-			"icon": [
-				"icons/32x32.png",
-				"icons/128x128.png",
-				"icons/128x128@2x.png",
-				"icons/icon.icns",
-				"icons/icon.ico"
-			],
-			"identifier": "com.agavram.dev",
-			"longDescription": "",
-			"macOS": {
-				"entitlements": null,
-				"exceptionDomain": "",
-				"frameworks": [],
-				"providerShortName": null,
-				"signingIdentity": null
-			},
-			"resources": [],
-			"shortDescription": "An LLM chat application",
-			"targets": "app"
-		},
-		"security": {
-			"csp": null
-		},
-		"updater": {
-			"active": false
-		},
+			}
+		}
+	},
+	"productName": "tauri-svelte",
+	"version": "0.1.0",
+	"identifier": "com.agavram.dev",
+	"plugins": {},
+	"app": {
+		"macOSPrivateApi": true,
+		"withGlobalTauri": true,
 		"windows": [
 			{
 				"fullscreen": false,
@@ -71,6 +53,9 @@
 				"height": 700,
 				"width": 600
 			}
-		]
+		],
+		"security": {
+			"csp": null
+		}
 	}
 }
