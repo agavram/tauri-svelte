@@ -22,6 +22,7 @@
 	onMount(() => {
 		const handleKeyDown = (event: KeyboardEvent) => {
 			if (event.metaKey && event.key === 'y') {
+				event.preventDefault()
 				setOpen(!open)
 			}
 		}
@@ -88,11 +89,11 @@
 		class="z-10 flex flex-row gap-2 bg-muted px-2 text-foreground shadow shadow-background"
 	>
 		<kbd
-			class="inline-flex size-5 items-center justify-center rounded-sm border border-accent bg-background text-sm shadow-kbd"
+			class="inline-flex size-5 items-center justify-center rounded-sm border border-muted bg-background text-sm shadow-kbd"
 			>⌘</kbd
 		>
 		<kbd
-			class="inline-flex size-5 items-center justify-center rounded-sm border border-accent bg-background font-mono text-sm shadow-kbd"
+			class="inline-flex size-5 items-center justify-center rounded-sm border border-muted bg-background font-mono text-sm shadow-kbd"
 			>Y</kbd
 		>
 	</Tooltip.Content>

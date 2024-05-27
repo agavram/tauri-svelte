@@ -13,11 +13,12 @@
 	let svg: SVGElement
 	let edit = false
 	let input: HTMLElement
+	let copied = false
 </script>
 
 <Alert.Root
 	class={cn(
-		'group inline-block w-fit max-w-[90%] p-1 px-2',
+		'group inline-block w-fit max-w-[95%] p-1 px-2',
 		message.role === 'user' && 'place-self-end',
 		edit && 'border-foreground'
 	)}
@@ -30,14 +31,14 @@
 					edit = false
 					chatHistory.messages.update(message.id, { content: message.content })
 				}}
-				contenteditable
+				contenteditable="plaintext-only"
 				bind:innerText={message.content}
 				bind:this={input}
 			>
 				{message.content}
 			</p>
 		{:else}
-			{@html DOMPurify.sanitize(md.render(message.content))}
+			{@html DOMPurify.sanitize(md.render(message.content), { ADD_ATTR: ['target'] })}
 		{/if}
 	</Alert.Description>
 	<div
@@ -53,52 +54,12 @@
 							await writeText(message.content)
 						} catch (e) {}
 
-						let shapes = ['M255.5 230.5a25 25 0 11-25 25 25 25 0 0125-25z']
-						let animatedShapes = []
-
-						for (var i = 0; i < 10; i++) {
-							let newElement = document.createElementNS('http://www.w3.org/2000/svg', 'path')
-							newElement.setAttribute('d', gsap.utils.random(shapes))
-							newElement.style.fill = '#ffffff'
-							svg.appendChild(newElement)
-							animatedShapes.push(newElement)
+						if (!copied) {
+							copied = true
+							setTimeout(() => (copied = false), 2000)
 						}
-
-						const killShapes = () => {
-							animatedShapes.forEach((shape) => {
-								svg.removeChild(shape)
-							})
-						}
-
-						gsap.set(animatedShapes, {
-							transformOrigin: 'center',
-							scale: 'random(0.3, 1.0)'
-						})
-
-						gsap.to(animatedShapes, {
-							onComplete: killShapes,
-							keyframes: [
-								{
-									rotate: 'random(180, -180)',
-									x: 'random([-200, -150, -250, 250, 150, 200])',
-									y: 'random([-200, -150, -250, 250, 150, 200])',
-									ease: 'expo.out',
-									duration: 2,
-									stagger: {
-										amount: 0.05
-									}
-								},
-								{ opacity: 0, delay: -2 }
-							]
-						})
 					}}
 				>
-					<svg
-						class="target absolute h-8 w-8"
-						role="presentation"
-						viewBox="0 0 500 500"
-						bind:this={svg}
-					></svg>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						width="14"
@@ -110,10 +71,14 @@
 						stroke-linecap="round"
 						stroke-linejoin="round"
 						class="lucide lucide-copy"
-						><rect width="14" height="14" x="8" y="8" rx="2" ry="2" /><path
-							d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"
-						/></svg
 					>
+						{#if copied}
+							<path class="animate-fadeInOut opacity-0 transition-opacity" d="m12 15 2 2 4-4" />
+						{/if}
+						<rect width="14" height="14" x="8" y="8" rx="2" ry="2" /><path
+							d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"
+						/>
+					</svg>
 				</Button>
 				<Button
 					variant="ghost"

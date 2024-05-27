@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { invoke } from '@tauri-apps/api/tauri'
-	import { appWindow } from '@tauri-apps/api/window'
-	import 'highlight.js/styles/stackoverflow-dark.min.css'
+	import 'highlight.js/styles/base16/ros-pine.min.css'
 	import '../app.css'
+	import { invoke, } from '@tauri-apps/api/core'
 
 	invoke('init_spotlight_window')
 </script>
@@ -11,7 +10,6 @@
 	<button
 		class="min-h-5 w-full cursor-default"
 		on:mousedown={() => {
-			appWindow.startDragging()
 		}}
 	></button>
 	<div

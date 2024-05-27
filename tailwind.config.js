@@ -18,6 +18,32 @@ const config = {
 				'custom-inset': 'inset -95px -0px 25px -75px hsl(var(--background))',
 				kbd: '0px 1px 0px 1px rgba(255, 255, 255, .07)'
 			},
+			animation: {
+				fadeInOut: 'fadeInOut 1500ms ease-in-out',
+				shake: 'shake 0.82s cubic-bezier(.36,.07,.19,.97) both'
+			},
+			keyframes: {
+				fadeInOut: {
+					'0%': { opacity: 0 },
+					'20%': { opacity: 1 },
+					'80%': { opacity: 1 },
+					'100%': { opacity: 0 }
+				},
+				shake: {
+					'10%, 90%': {
+						transform: 'translate3d(-1px, 0, 0)'
+					},
+					'20%, 80%': {
+						transform: 'translate3d(2px, 0, 0)'
+					},
+					'30%, 50%, 70%': {
+						transform: 'translate3d(-4px, 0, 0)'
+					},
+					'40%, 60%': {
+						transform: 'translate3d(4px, 0, 0)'
+					}
+				}
+			},
 			colors: {
 				border: 'hsl(var(--border) / <alpha-value>)',
 				input: 'hsl(var(--input) / <alpha-value>)',

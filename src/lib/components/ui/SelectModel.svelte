@@ -1,8 +1,9 @@
 <script lang="ts">
 	import * as Select from '$lib/components/ui/select'
 	import * as Tooltip from '$lib/components/ui/tooltip'
-	import { lastModel, openai } from '$lib/openai'
+	import { lastModel, openai, openaiKey } from '$lib/openai'
 	import { openedDialog } from '$lib/text.store'
+	import { type Model } from 'openai/resources/index.mjs'
 	import { onMount, tick } from 'svelte'
 	import { z } from 'zod'
 
@@ -19,6 +20,7 @@
 	onMount(() => {
 		const handleKeyDown = (event: KeyboardEvent) => {
 			if (event.metaKey && event.key === 'g') {
+				event.preventDefault()
 				setOpen(!open)
 			}
 		}
@@ -27,21 +29,28 @@
 		return () => window.removeEventListener('keydown', handleKeyDown)
 	})
 
-	let models = (async () => {
-		let retryCount = 0
-		while (true) {
-			try {
-				const response = await openai.models.list()
-				return response.data
-					.filter((m) => m.id.includes('gpt'))
-					.sort((a, b) => b.created - a.created)
-			} catch (error) {
-				if (++retryCount >= 3) {
-					throw error
+	let models: Promise<Model[]> = new Promise(() => {})
+	$: {
+		models = (async () => {
+			if (!$openaiKey) {
+				return []
+			}
+
+			let retryCount = 0
+			while (true) {
+				try {
+					const response = await openai.models.list()
+					return response.data
+						.filter((m) => m.id.includes('gpt'))
+						.sort((a, b) => b.created - a.created)
+				} catch (error) {
+					if (++retryCount >= 3) {
+						throw error
+					}
 				}
 			}
-		}
-	})()
+		})()
+	}
 </script>
 
 <Tooltip.Root>
@@ -79,11 +88,11 @@
 				{$lastModel.lastUsedId}
 			</Select.Trigger>
 			<Select.Content class="max-h-80 overflow-y-auto" sameWidth={false} align="start">
+				<Select.Label>Available Models</Select.Label>
+				<Select.Separator />
 				{#await models}
 					<Select.Item disabled value="Loading..."></Select.Item>
 				{:then models}
-					<Select.Label>Available Models</Select.Label>
-					<Select.Separator />
 					<div class="flex flex-col">
 						{#each models as model}
 							<Select.Item
@@ -103,11 +112,11 @@
 		class="z-10 flex flex-row gap-2 bg-muted px-2 text-foreground shadow shadow-background"
 	>
 		<kbd
-			class="shadow-kbd inline-flex size-5 items-center justify-center rounded-sm border border-accent bg-background text-sm"
+			class="inline-flex size-5 items-center justify-center rounded-sm border border-muted bg-background text-sm shadow-kbd"
 			>⌘</kbd
 		>
 		<kbd
-			class="shadow-kbd inline-flex size-5 items-center justify-center rounded-sm border border-accent bg-background font-mono text-sm"
+			class="inline-flex size-5 items-center justify-center rounded-sm border border-muted bg-background font-mono text-sm shadow-kbd"
 			>G</kbd
 		>
 	</Tooltip.Content>

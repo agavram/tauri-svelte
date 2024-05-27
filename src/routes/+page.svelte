@@ -5,6 +5,7 @@
 
 	const handleKeyDown = (event: KeyboardEvent) => {
 		if (event.metaKey && event.key === 't') {
+			event.preventDefault()
 			selectedConversation.set(new Date().getTime())
 		}
 

@@ -4,34 +4,26 @@
 
 @layer base {
 	:root {
-		--background: 240 10% 3.9%;
-		--foreground: 0 0% 98%;
+      --background: 0 0% 6.27%;
+      --foreground: 252 37% 98%;
+      --muted: 0 0% 10.98%;
+      --muted-foreground: 0 0% 62.75%;
+      --popover: 0 0% 8.63%;
+      --popover-foreground: 252 37% 99%;
+      --card: 0 0% 6.27%;
+      --card-foreground: 252 37% 99%;
+      --border: 0 0% 15.69%;
+      --input: 0 0% 10.98%;
+      --primary: 27.06 100% 80%;
+      --primary-foreground: 0 0% 0%;
+      --secondary: 164.12 100% 80%;
+      --secondary-foreground: 0 0% 0%;
+      --accent: 27.06 100% 80%;
+      --accent-foreground: 0 0% 0%;
+      --destructive: 0 21.31% 11.96%;
+      --destructive-foreground: 0 100% 75.1%;
+      --ring: 27.06 100% 80%;
 
-		--muted: 240 3.7% 10%;
-		--muted-foreground: 240 5% 64.9%;
-
-		--popover: 240 10% 3.9%;
-		--popover-foreground: 0 0% 98%;
-
-		--card: 240 10% 3.9%;
-		--card-foreground: 0 0% 98%;
-
-		--border: 240 3.7% 10%;
-		--input: 240 3.7% 10%;
-
-		--primary: 0 0% 98%;
-		--primary-foreground: 240 5.9% 10%;
-
-		--secondary: 240 3.7% 10%;
-		--secondary-foreground: 0 0% 98%;
-
-		--accent: 240 3.7% 10%;
-		--accent-foreground: 0 0% 98%;
-
-		--destructive: 0 62.8% 30.6%;
-		--destructive-foreground: 0 0% 98%;
-
-		--ring: 240 4.9% 83.9%;
 
 		--radius: 0.6rem;
 	}
@@ -48,12 +40,6 @@
 		background-clip: padding-box;
 		overflow: hidden;
 	}
-}
-
-span[contenteditable]::before {
-	content: attr(placeholder);
-	color: hsl(var(--muted-foreground));
-	pointer-events: none;
 }
 
 html {
@@ -158,7 +144,7 @@ blockquote p {
 }
 
 .md p {
-	@apply my-1;
+	@apply my-2;
 }
 
 .md hr {

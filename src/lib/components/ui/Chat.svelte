@@ -1,6 +1,6 @@
 <script lang="ts">
 	import * as Alert from '$lib/components/ui/alert'
-	import { lastModel, openai } from '$lib/openai'
+	import { lastModel, openai, openaiTemp } from '$lib/openai'
 	import { chatHistory, type DexieMessage } from '$lib/text.store.js'
 	import { md } from '$lib/utils'
 	import DOMPurify from 'dompurify'
@@ -13,6 +13,7 @@
 	import TextInput from './TextInput.svelte'
 	import { liveQuery } from 'dexie'
 	import NewConversation from './NewConversation.svelte'
+	import Settings from './Settings.svelte'
 
 	export let id: number
 	let pending = false
@@ -61,7 +62,8 @@
 			stream = await openai.chat.completions.create({
 				model: $lastModel.lastUsedId,
 				messages: copy,
-				stream: true
+				stream: true,
+				temperature: $openaiTemp,
 			})
 
 			for await (const chunk of stream) {
@@ -128,9 +130,9 @@
 		<ChatMessage {message} />
 	{/each}
 	{#if streaming}
-		<Alert.Root class={'group inline-block w-fit max-w-[90%] p-1 px-2'}>
+		<Alert.Root class={'group inline-block w-fit max-w-[95%] p-1 px-2'}>
 			<Alert.Description class="md block rounded-sm px-1">
-				{@html DOMPurify.sanitize(md.render(streaming))}
+				{@html DOMPurify.sanitize(md.render(streaming), { ADD_ATTR: ['target'] })}
 			</Alert.Description>
 		</Alert.Root>
 	{/if}
@@ -138,9 +140,12 @@
 
 <div class="z-10 flex flex-col items-start gap-1 px-4">
 	<TextInput {onSubmit} {pending} />
-	<div class="flex flex-row gap-1">
-		<NewConversation />
-		<SelectConversation />
-		<SelectModel />
+	<div class="flex w-full flex-row justify-between">
+		<div class="flex flex-row gap-1">
+			<NewConversation />
+			<SelectConversation />
+			<SelectModel />
+		</div>
+		<Settings />
 	</div>
 </div>
