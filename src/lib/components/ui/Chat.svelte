@@ -1,10 +1,10 @@
 <script lang="ts">
 	import * as Alert from '$lib/components/ui/alert'
-	import { lastModel, openai, openaiTemp } from '$lib/openai'
+	import { lastModel, openai, openaiPrompt, openaiTemp } from '$lib/openai'
 	import { chatHistory, type DexieMessage } from '$lib/text.store.js'
 	import { md } from '$lib/utils'
 	import DOMPurify from 'dompurify'
-	import type { ChatCompletionChunk } from 'openai/resources/index.mjs'
+	import type { ChatCompletionChunk, ChatCompletionMessageParam } from 'openai/resources/index.mjs'
 	import type { Stream } from 'openai/streaming.mjs'
 	import { onMount, tick } from 'svelte'
 	import ChatMessage from './ChatMessage.svelte'
@@ -31,14 +31,13 @@
 		}
 		const cid = id
 		pending = true
-		const copy = [...($history ?? [])]
+		const copy: ChatCompletionMessageParam[] = [...($history ?? [])]
 
 		try {
+			await chatHistory.messages.add({ cid, content: query, role: 'user' } as DexieMessage)
 			copy.push({
 				role: 'user',
-				content: query,
-				cid,
-				id: await chatHistory.messages.add({ cid, content: query, role: 'user' } as DexieMessage)
+				content: query
 			})
 
 			copy.length === 1 &&
@@ -61,9 +60,18 @@
 
 			stream = await openai.chat.completions.create({
 				model: $lastModel.lastUsedId,
-				messages: copy,
+				messages:
+					$openaiPrompt.length > 0
+						? [
+								{
+									role: 'system',
+									content: $openaiPrompt
+								},
+								...copy
+							]
+						: copy,
 				stream: true,
-				temperature: $openaiTemp,
+				temperature: $openaiTemp
 			})
 
 			for await (const chunk of stream) {

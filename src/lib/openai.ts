@@ -6,6 +6,9 @@ import { get } from 'svelte/store'
 export const openaiKeyZ = z.string()
 export const openaiKey = storedWritable('openai-key', openaiKeyZ, '')
 
+export const openaiPromptZ = z.string()
+export const openaiPrompt = storedWritable('openai-prompt', openaiKeyZ, '')
+
 export const openaiTempZ = z
 	.number({ message: 'Temperature must be between 0 and 2' })
 	.min(0, { message: 'Temperature must be between 0 and 2' })
@@ -24,7 +27,8 @@ export const lastModel = storedWritable(
 
 export const openAiSchema = z.object({
 	apiKey: openaiKeyZ,
-	temperature: openaiTempZ
+	temperature: openaiTempZ,
+	prompt: openaiPromptZ
 })
 
 export const openai = new OpenAI({

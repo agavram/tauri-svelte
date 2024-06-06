@@ -93,15 +93,19 @@
 				{#await models}
 					<Select.Item disabled value="Loading..."></Select.Item>
 				{:then models}
-					<div class="flex flex-col">
-						{#each models as model}
-							<Select.Item
-								class="inline-block w-full flex-row place-items-center overflow-hidden text-ellipsis text-nowrap"
-								value={model.id}
-								label={model.id}
-							></Select.Item>
-						{/each}
-					</div>
+					{#if models.length}
+						<div class="flex flex-col">
+							{#each models as model}
+								<Select.Item
+									class="relative inline w-full max-w-60 flex-row place-items-center overflow-hidden text-ellipsis whitespace-nowrap pr-2"
+									value={model.id}
+									label={model.id}
+								></Select.Item>
+							{/each}
+						</div>
+					{:else}
+						<Select.Item disabled value="Loading..."></Select.Item>
+					{/if}
 				{:catch error}
 					<Select.Item class="text-red-400" disabled value="An error occurred"></Select.Item>
 				{/await}

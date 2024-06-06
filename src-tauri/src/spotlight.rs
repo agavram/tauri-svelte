@@ -2,30 +2,15 @@ use std::sync::{Mutex, Once};
 
 use bitflags::bitflags;
 
-use objc_id::{Id, ShareId};
-use tauri::{
-    AppHandle, Manager, PhysicalPosition, PhysicalSize, Window, Wry,
-};
-use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial};
+use tauri::{AppHandle, Manager, PhysicalPosition, PhysicalSize, Window, Wry};
 use tauri_nspanel::WebviewWindowExt;
 
-
 use cocoa::{
-    appkit::{
-        CGFloat, NSColor, NSView, NSViewHeightSizable, NSViewWidthSizable,
-        NSWindowCollectionBehavior,
-    },
+    appkit::{CGFloat, NSView},
     base::{id, nil, BOOL, NO, YES},
     foundation::{NSPoint, NSRect, NSSize, NSString},
 };
-use objc::{
-    class,
-    declare::ClassDecl,
-    msg_send,
-    runtime::{self, Class, Object, Protocol, Sel},
-    sel, sel_impl, Message,
-};
-use objc_foundation::INSObject;
+use objc::{class, msg_send, sel, sel_impl};
 
 #[link(name = "Foundation", kind = "framework")]
 extern "C" {

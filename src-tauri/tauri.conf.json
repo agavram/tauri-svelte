@@ -41,7 +41,6 @@
 	"plugins": {},
 	"app": {
 		"macOSPrivateApi": true,
-		"withGlobalTauri": true,
 		"windows": [
 			{
 				"fullscreen": false,
@@ -50,8 +49,8 @@
 				"visible": false,
 				"transparent": true,
 				"maximizable": false,
-				"height": 700,
-				"width": 600
+				"height": 800,
+				"width": 700
 			}
 		],
 		"security": {

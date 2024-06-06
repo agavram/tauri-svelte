@@ -14,23 +14,21 @@ use tauri::{
     image::Image,
     menu::{MenuBuilder, MenuItemBuilder},
     tray::TrayIconBuilder,
-    Manager, WebviewWindow,
+    AppHandle, Manager, WebviewWindow, Wry,
 };
 use tauri_nspanel::{panel_delegate, ManagerExt, WebviewWindowExt};
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
+use tauri_plugin_shell::ShellExt;
 
 mod spotlight;
 
 fn main() {
-    // let quit = tauri::tray:: CustomMenuItem::new("quit".to_string(), "Quit").accelerator("Cmd+Q");
-    // let tray_menu = SystemTrayMenu::new().add_item(quit);
-    // let system_tray = SystemTray::new().with_menu(tray_menu);
-
     tauri::Builder::default()
+        .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(
             tauri_plugin_global_shortcut::Builder::new()
-                .with_handler(|app, shortcut, event| {
+                .with_handler(|app: &AppHandle, shortcut, event| {
                     if event.state == ShortcutState::Released {
                         return;
                     }
@@ -44,7 +42,7 @@ fn main() {
                 .build(),
         )
         .plugin(tauri_nspanel::init())
-        .invoke_handler(tauri::generate_handler![spotlight::init_spotlight_window,])
+        .invoke_handler(tauri::generate_handler![hide_spotlight])
         .manage(spotlight::State::default())
         .setup(move |app| {
             let app_handle = app.app_handle();
@@ -67,7 +65,7 @@ fn main() {
             });
 
             let p = panel.clone();
-            delegate.set_listener(Box::new(move |delegate_name: String| {
+            delegate.set_listener(Box::new(move |_: String| {
                 p.order_out(None);
             }));
             // Set your panel's delegate
@@ -77,7 +75,7 @@ fn main() {
                 .accelerator("Cmd+Q")
                 .build(app)?;
             let menu = MenuBuilder::new(app).items(&[&quit]).build()?;
-            let tray = TrayIconBuilder::new()
+            let _ = TrayIconBuilder::new()
                 .menu(&menu)
                 .on_menu_event(move |app, event| match event.id().as_ref() {
                     "quit" => {
@@ -85,7 +83,7 @@ fn main() {
                     }
                     _ => (),
                 })
-                .icon(Image::from_path("icons/icon.png").unwrap())
+                .icon(Image::from_bytes(include_bytes!("../icons/icon.png")).unwrap())
                 .build(app)?;
             app.set_activation_policy(tauri::ActivationPolicy::Accessory);
 
@@ -94,9 +92,14 @@ fn main() {
         .build(tauri::generate_context!())
         .expect("error while building tauri application")
         .run(|_app_handle, event| match event {
-            tauri::RunEvent::ExitRequested { api, .. } => {
+            tauri::RunEvent::ExitRequested { .. } => {
                 // api.prevent_exit();
             }
             _ => {}
         });
+}
+
+#[tauri::command]
+fn hide_spotlight(window: tauri::Window) {
+    window.get_webview_panel("main").unwrap().order_out(None);
 }

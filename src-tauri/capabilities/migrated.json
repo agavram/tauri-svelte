@@ -53,6 +53,8 @@
     "global-shortcut:allow-unregister-all",
     "clipboard-manager:allow-write-text",
     "global-shortcut:default",
-    "clipboard-manager:default"
+    "clipboard-manager:default",
+    "shell:default",
+    "shell:allow-open"
   ]
 }

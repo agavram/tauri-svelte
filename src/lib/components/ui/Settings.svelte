@@ -3,15 +3,16 @@
 	import { Input } from '$lib/components/ui/input'
 	import { Label } from '$lib/components/ui/label'
 	import * as Tooltip from '$lib/components/ui/tooltip'
+	import { openAiSchema, openaiKey, openaiPrompt, openaiTemp } from '$lib/openai'
 	import { openedDialog } from '$lib/text.store'
+	import { cn } from '$lib/utils'
 	import { onMount, tick } from 'svelte'
-	import { defaults, superForm, type Infer, numberProxy } from 'sveltekit-superforms'
-	import { zod } from 'sveltekit-superforms/adapters'
-	import { openAiSchema, openaiKey, openaiTemp } from '../../openai'
-	import Button from './button/button.svelte'
 	import { get } from 'svelte/store'
-	import { cn } from '../../utils'
 	import { fade } from 'svelte/transition'
+	import { defaults, numberProxy, superForm, type Infer } from 'sveltekit-superforms'
+	import { zod } from 'sveltekit-superforms/adapters'
+	import Button from './button/button.svelte'
+	import Textarea from './textarea/textarea.svelte'
 
 	let errored = false
 	let submitted = false
@@ -21,37 +22,36 @@
 		errors,
 		enhance,
 		reset: rawReset
-	} = superForm<Infer<typeof openAiSchema>, { status: number; text: string }>(
-		defaults(zod(openAiSchema)),
-		{
-			SPA: true,
-			resetForm: false,
-			clearOnSubmit: 'none',
-			validators: zod(openAiSchema),
-			onUpdated(event) {
-				if (event.form.valid && !submitted) {
-					submitted = true
-					setTimeout(() => {
-						submitted = false
-					}, 1500)
-				} else if (!event.form.valid && !errored) {
-					errored = true
-					setTimeout(() => {
-						errored = false
-					}, 1000)
-				}
+	} = superForm<Infer<typeof openAiSchema>>(defaults(zod(openAiSchema)), {
+		SPA: true,
+		resetForm: false,
+		clearOnSubmit: 'none',
+		validators: zod(openAiSchema),
+		onUpdated(event) {
+			if (event.form.valid && !submitted) {
+				submitted = true
+				setTimeout(() => {
+					submitted = false
+				}, 1500)
+			} else if (!event.form.valid && !errored) {
+				errored = true
+				setTimeout(() => {
+					errored = false
+				}, 1000)
+			}
 
-				openaiKey.set(event.form.data.apiKey)
-				openaiTemp.set(event.form.data.temperature)
-			},
-			validationMethod: 'oninput'
-		}
-	)
+			openaiKey.set(event.form.data.apiKey)
+			openaiTemp.set(event.form.data.temperature)
+			openaiPrompt.set(event.form.data.prompt.trim())
+		},
+		validationMethod: 'oninput'
+	})
 	const reset = () => {
 		rawReset({
 			data: {
 				apiKey: get(openaiKey),
-				temperature: get(openaiTemp)
+				temperature: get(openaiTemp),
+				prompt: get(openaiPrompt)
 			}
 		})
 	}
@@ -132,7 +132,7 @@
 	<Dialog.Content class="sm:max-w-lg">
 		<Dialog.Header class="place-items-start">
 			<Dialog.Title>Settings</Dialog.Title>
-			<Dialog.Description>
+			<Dialog.Description class="text-left">
 				Make edits to your OpenAI API Key and model temperature
 			</Dialog.Description>
 		</Dialog.Header>
@@ -186,9 +186,22 @@
 						deterministic.
 					</Label>
 				</div>
+				<div class="grid grid-cols-4 items-center gap-x-4 gap-y-2">
+					<Label for="prompt" class="text-left">System Prompt</Label>
+					<Textarea
+						name="prompt"
+						class="col-span-3 max-h-32"
+						placeholder="You are a helpful assistant."
+						bind:value={$form.prompt}
+					></Textarea>
+				</div>
 			</div>
 			<Dialog.Footer>
-				<Button name="submit" class={cn('relative w-32 place-self-end', errored && 'animate-shake')} type="submit">
+				<Button
+					name="submit"
+					class={cn('relative w-32 place-self-end', errored && 'animate-shake')}
+					type="submit"
+				>
 					{#if submitted}
 						<svg
 							class="absolute"
